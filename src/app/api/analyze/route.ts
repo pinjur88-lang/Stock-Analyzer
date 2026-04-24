@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       
       Requirements:
       1. **Intrinsic Value**: Calculate a fair intrinsic value using a simplified DCF (Discounted Cash Flow) based on current margins (${(stats.profitMargins * 100).toFixed(2)}%) and growth (${(stats.revenueGrowth * 100).toFixed(2)}%).
-      2. **Finance for 20-Year-Olds**: Explain this company's numbers as if you were talking to a 20-year-old. Use analogies like "Side Hustles," "Credit Scores," "Rent/Subscriptions," "Scaling a Startup," or "Maxing out a Credit Card." Avoid "lemonade stands" or "allowances." Focus on how this business affects their actual lifestyle or how it relates to their hustle.
+      2. **The ELI5 Breakdown (Simple Terms)**: Explain this company to someone who is entirely financially illiterate or very young. You MUST answer these two things in simple terms: 1) What exactly does this company produce or do? 2) Where does their major cash flow actually come from (how do they make money)? Use relatable analogies like "Side Hustles," "Subscriptions," or "Selling picks and shovels." Focus on how their business model actually functions in the real world without using jargon.
       3. **Sector Dynamics**: Dynamics, headwinds, tailwinds, and shifts.
       4. **Management Assessment**: Capability and trustworthiness scores.
       5. **Price Targets**: Method-based 12-month projections.

@@ -163,8 +163,8 @@ export default function Dashboard() {
                          <Zap className="w-6 h-6" />
                       </div>
                       <div>
-                         <h2 className="text-xl font-bold text-indigo-100 tracking-tight">Investor's Lounge</h2>
-                         <p className="text-xs text-indigo-400/80 font-bold uppercase tracking-widest">20-Year-Old's Perspective</p>
+                         <h2 className="text-xl font-bold text-indigo-100 tracking-tight">The ELI5 Breakdown</h2>
+                         <p className="text-xs text-indigo-400/80 font-bold uppercase tracking-widest">Products & Cash Flow in Simple Terms</p>
                       </div>
                    </div>
                    <p className="text-lg text-neutral-300 leading-relaxed font-medium italic">
