@@ -11,9 +11,9 @@ export async function GET() {
     
     let topSymbol = fallbackSymbols[0];
 
-    if (results && results.quotes && results.quotes.length > 0) {
+    if (results && (results as any).quotes && (results as any).quotes.length > 0) {
         // Filter out non-equity/index weirdness if possible, but taking the top one is usually fine.
-        const validQuotes = results.quotes.filter(q => q.symbol && !q.symbol.startsWith('^'));
+        const validQuotes = (results as any).quotes.filter((q: any) => q.symbol && !q.symbol.startsWith('^'));
         if (validQuotes.length > 0) {
             topSymbol = validQuotes[0].symbol;
         }

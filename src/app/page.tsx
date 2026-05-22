@@ -447,7 +447,7 @@ export default function Dashboard() {
                          <div key={i} className="flex items-center gap-4">
                             <div className="w-24 text-right text-xs font-bold text-neutral-400">{item.label}</div>
                             <div className="flex-1 bg-neutral-950 rounded-full h-3 overflow-hidden">
-                               <div className={`h-full ${item.color}`} style={{ width: \`\${(item.count / 30) * 100}%\` }}></div>
+                               <div className={`h-full ${item.color}`} style={{ width: (item.count / 30) * 100 + "%" }}></div>
                             </div>
                             <div className="w-8 text-sm font-black">{item.count}</div>
                          </div>
