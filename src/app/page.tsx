@@ -5,7 +5,7 @@ import {
   Search, TrendingUp, AlertCircle, Activity, Zap, 
   BarChart3, PieChart, Layers, ShieldCheck, 
   Scale, Target, Swords, Eye, ArrowUpRight, ArrowDownRight,
-  Info, CheckCircle2, XCircle, UserCheck, HelpCircle, Users, BarChart
+  Info, CheckCircle2, XCircle, UserCheck, HelpCircle, Users, BarChart, Loader2
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -13,18 +13,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [isFetchingTrending, setIsFetchingTrending] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!ticker) return;
-    
+  const fetchAnalysis = async (searchTicker: string) => {
+    if (!searchTicker) return;
     setLoading(true);
     setData(null);
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ticker }),
+        body: JSON.stringify({ ticker: searchTicker }),
       });
       const result = await response.json();
       if (result.error) throw new Error(result.error);
@@ -34,6 +33,27 @@ export default function Dashboard() {
       alert(err.message || "Something went wrong. Make sure to use .TO for TSX stocks.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchAnalysis(ticker);
+  };
+
+  const handleTrendingSearch = async () => {
+    setIsFetchingTrending(true);
+    try {
+      const res = await fetch("/api/trending");
+      const result = await res.json();
+      if (result.ticker) {
+        setTicker(result.ticker);
+        fetchAnalysis(result.ticker);
+      }
+    } catch (error) {
+      alert("Could not fetch trending stocks. Try searching manually.");
+    } finally {
+      setIsFetchingTrending(false);
     }
   };
 
@@ -96,30 +116,89 @@ export default function Dashboard() {
     </div>
   );
 
+  // === GOOGLE STYLE LANDING PAGE ===
+  if (!data && !loading) {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 relative overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neutral-900/50 blur-[120px] rounded-full -z-10"></div>
+        
+        <div className="w-full max-w-2xl flex flex-col items-center animate-in fade-in zoom-in-95 duration-1000">
+          
+          {/* Classic Google Colors Logo: Blue, Red, Yellow, Green */}
+          <h1 className="text-7xl md:text-8xl font-black tracking-tighter mb-10 select-none">
+            <span className="text-[#4285F4]">O</span>
+            <span className="text-[#EA4335]">g</span>
+            <span className="text-[#FBBC05]">i</span>
+            <span className="text-[#34A853]">e</span>
+          </h1>
+
+          <form onSubmit={handleSearch} className="w-full relative group">
+            <div className="absolute inset-0 bg-neutral-800/50 rounded-full blur-xl group-hover:bg-neutral-800 transition-all duration-500 -z-10"></div>
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-400 w-5 h-5 group-hover:text-neutral-300 transition-colors z-10" />
+            <input
+              type="text"
+              placeholder="Search for a ticker (e.g., AAPL, TD.TO)..."
+              className="w-full bg-neutral-900/80 backdrop-blur-md border border-neutral-700/50 hover:border-neutral-600 focus:border-neutral-500 rounded-full py-4 pl-14 pr-6 text-lg font-medium text-neutral-100 focus:outline-none focus:ring-4 focus:ring-neutral-800/50 transition-all placeholder:text-neutral-500 shadow-2xl relative z-10"
+              value={ticker}
+              onChange={(e) => setTicker(e.target.value)}
+              autoFocus
+            />
+          </form>
+
+          <div className="flex items-center gap-4 mt-8">
+            <button 
+              onClick={handleSearch}
+              className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-lg text-sm font-medium text-neutral-300 transition-all"
+            >
+              Analyze Stock
+            </button>
+            <button 
+              onClick={handleTrendingSearch}
+              disabled={isFetchingTrending}
+              className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-lg text-sm font-medium text-neutral-300 transition-all flex items-center gap-2 disabled:opacity-50"
+            >
+              {isFetchingTrending ? <Loader2 className="w-4 h-4 animate-spin" /> : <TrendingUp className="w-4 h-4" />}
+              Trending Active
+            </button>
+          </div>
+
+          <p className="mt-12 text-xs text-neutral-600 font-medium tracking-wide">
+             Institutional Grade Intelligence • Simplified for Everyone
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // === DASHBOARD VIEW ===
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 p-6 md:p-12 font-sans selection:bg-emerald-500/30">
       <div className="max-w-7xl mx-auto space-y-12">
         
-        {/* Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold tracking-widest rounded uppercase border border-emerald-500/20">Institutional Grade</span>
-            </div>
-            <h1 className="text-4xl font-black bg-gradient-to-r from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent tracking-tighter">
-              Equity Intelligence Engine
+        {/* Header (Top-left logo style) */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-in slide-in-from-top-4 duration-500">
+          <div 
+             className="flex items-center cursor-pointer select-none group"
+             onClick={() => { setData(null); setTicker(""); }}
+          >
+            <h1 className="text-3xl font-black tracking-tighter">
+              <span className="text-[#4285F4]">O</span>
+              <span className="text-[#EA4335]">g</span>
+              <span className="text-[#FBBC05]">i</span>
+              <span className="text-[#34A853]">e</span>
             </h1>
-            <p className="text-neutral-500 font-medium">Deep-dive fundamental analysis & analyst debate platform.</p>
+            <span className="ml-3 px-2 py-0.5 bg-neutral-900 text-neutral-400 text-[10px] font-bold tracking-widest rounded uppercase border border-neutral-800 group-hover:border-neutral-700 transition-colors">Intelligence</span>
           </div>
           
-          <form onSubmit={handleSearch} className="relative w-full md:w-96">
+          <form onSubmit={handleSearch} className="relative w-full md:w-[400px]">
             <div className="relative flex items-center group">
-              <div className="absolute inset-0 bg-emerald-500/10 rounded-2xl blur-xl group-focus-within:bg-emerald-500/20 transition-all"></div>
-              <Search className="absolute left-4 text-neutral-500 w-5 h-5 group-focus-within:text-emerald-500 transition-colors z-10" />
+              <div className="absolute inset-0 bg-neutral-900/50 rounded-full blur-xl group-focus-within:bg-neutral-800/50 transition-all"></div>
+              <Search className="absolute left-4 text-neutral-500 w-4 h-4 group-focus-within:text-neutral-300 transition-colors z-10" />
               <input
                 type="text"
-                placeholder="Ticker (e.g., RY.TO, SU.TO, TD.TO)"
-                className="w-full bg-neutral-900/80 backdrop-blur-md border border-neutral-800 rounded-2xl py-4 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-neutral-600 relative z-10"
+                placeholder="Search ticker..."
+                className="w-full bg-neutral-900/80 backdrop-blur-md border border-neutral-800 rounded-full py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-neutral-700 transition-all placeholder:text-neutral-600 relative z-10"
                 value={ticker}
                 onChange={(e) => setTicker(e.target.value)}
               />
@@ -142,21 +221,7 @@ export default function Dashboard() {
               <p className="text-neutral-500 animate-pulse font-medium max-w-xs mx-auto">Reviewing transcripts, sector dynamics, and calculating valuations...</p>
             </div>
           </div>
-        ) : !data ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-20">
-             {[
-               { icon: Eye, title: "Deep Visibility", text: "We analyze beyond the balance sheet into management transcripts and sector trends." },
-               { icon: Target, title: "Price Accuracy", text: "Multi-model price targets calculated through rerating & sector-specific multiples." },
-               { icon: Swords, title: "Expert Debates", text: "Every stock is put through a simulated debate between a Super Bull and a Super Bear." }
-             ].map((feature, i) => (
-                <div key={i} className="bg-neutral-900/30 border border-neutral-800/50 p-8 rounded-[2.5rem] hover:border-neutral-700 transition-all group">
-                   <feature.icon className="w-10 h-10 text-neutral-600 mb-6 group-hover:text-emerald-500 transition-colors" />
-                   <h3 className="text-lg font-bold text-neutral-200 mb-2 tracking-tight">{feature.title}</h3>
-                   <p className="text-sm text-neutral-500 leading-relaxed font-medium">{feature.text}</p>
-                </div>
-             ))}
-          </div>
-        ) : (
+        ) : data ? (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
             {renderTabNavigation()}
 
@@ -442,7 +507,7 @@ export default function Dashboard() {
                </div>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
