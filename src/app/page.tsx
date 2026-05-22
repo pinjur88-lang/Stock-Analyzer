@@ -322,6 +322,7 @@ export default function Dashboard() {
                   </div>
 
                   {/* End Sector Dynamics */}
+                </div>
 
                 {/* Sidebar Analysis */}
                 <div className="space-y-8">
@@ -418,19 +419,30 @@ export default function Dashboard() {
                         <p className="text-neutral-500 text-center py-8">No recent insider trading activity found.</p>
                       ) : (
                         data.insiderTrades.map((trade: any, i: number) => (
-                          <div key={i} className="bg-neutral-950 p-4 rounded-2xl border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                             <div>
-                                <h4 className="text-sm font-bold text-neutral-200">{trade.filerName}</h4>
-                                <p className="text-[10px] text-neutral-500 mt-1">{trade.transactionText}</p>
+                          <div key={i} className="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 flex flex-col gap-4">
+                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                               <div>
+                                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                                    <h4 className="text-sm font-bold text-neutral-200">{trade.filerName}</h4>
+                                    {trade.date && <span className="px-2 py-0.5 bg-neutral-900 border border-neutral-800 rounded-full text-[9px] font-bold tracking-widest text-neutral-400 uppercase">{trade.date}</span>}
+                                  </div>
+                                  <p className="text-[10px] text-neutral-500">{trade.transactionText}</p>
+                               </div>
+                               <div className="text-left sm:text-right flex-shrink-0">
+                                  <span className="block text-sm font-black text-white">
+                                    {trade.shares ? trade.shares.toLocaleString() : 0} Shares
+                                  </span>
+                                  <span className="block text-[10px] text-neutral-400 mt-1">
+                                    Value: ${trade.value ? trade.value.toLocaleString() : 0}
+                                  </span>
+                               </div>
                              </div>
-                             <div className="text-left sm:text-right">
-                                <span className="block text-sm font-black text-white">
-                                  {trade.shares ? trade.shares.toLocaleString() : 0} Shares
-                                </span>
-                                <span className="block text-[10px] text-neutral-400 mt-1">
-                                  Value: ${trade.value ? trade.value.toLocaleString() : 0}
-                                </span>
-                             </div>
+                             {trade.simpleExplanation && (
+                               <div className="bg-purple-500/5 border border-purple-500/10 rounded-xl p-3 flex gap-3">
+                                 <Info className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                                 <p className="text-xs text-neutral-300 font-medium leading-relaxed">{trade.simpleExplanation}</p>
+                               </div>
+                             )}
                           </div>
                         ))
                       )}

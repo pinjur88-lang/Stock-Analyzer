@@ -87,13 +87,42 @@ export async function POST(request: Request) {
     const deepDive = JSON.parse(aiResult.candidates?.[0]?.content?.parts?.[0]?.text || "{}");
 
     // Format Insider Transactions for UI
-    const formattedInsiders = stats.insiderTransactions.map((trade: any) => ({
-      filerName: trade.filerName,
-      transactionText: trade.transactionText,
-      shares: trade.shares,
-      value: trade.value,
-      date: trade.startDate
-    }));
+    const formattedInsiders = stats.insiderTransactions.map((trade: any) => {
+      let simpleExplanation = "They moved shares around.";
+      const text = (trade.transactionText || "").toLowerCase();
+      
+      if (text.includes("public market") && text.includes("acquisition")) {
+        simpleExplanation = "They used their own personal cash to buy shares on the open market. This is a strong sign they believe the stock will go up!";
+      } else if (text.includes("public market") && text.includes("sale")) {
+        simpleExplanation = "They sold their shares for cash on the open market. They might be taking profits or just need cash.";
+      } else if (text.includes("option") && text.includes("exercise")) {
+        simpleExplanation = "They used a company perk to buy shares at a huge discount.";
+      } else if (text.includes("grant") || text.includes("award")) {
+        simpleExplanation = "The company gifted them free shares as a performance bonus or salary.";
+      } else if (text.includes("automatic")) {
+        simpleExplanation = "This was a pre-scheduled, automated trade. It happens automatically on a specific date.";
+      } else if (text.includes("disposition") || text.includes("tax")) {
+        simpleExplanation = "They gave up or sold shares, usually just to cover the taxes they owe on a stock bonus.";
+      }
+
+      let formattedDate = "Unknown Date";
+      if (trade.startDate) {
+        // Just slice the string or parse date safely
+        const d = new Date(trade.startDate);
+        if (!isNaN(d.getTime())) {
+          formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(d);
+        }
+      }
+
+      return {
+        filerName: trade.filerName,
+        transactionText: trade.transactionText,
+        shares: trade.shares,
+        value: trade.value,
+        date: formattedDate,
+        simpleExplanation
+      };
+    });
 
     return NextResponse.json({
       ticker: ticker.toUpperCase(),
