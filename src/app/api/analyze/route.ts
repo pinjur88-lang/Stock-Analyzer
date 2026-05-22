@@ -13,9 +13,17 @@ export async function POST(request: Request) {
 
     const apiKey = process.env.GEMINI_API_KEY || "";
 
-    // 1. Fetch Comprehensive Finance Data
+    // 1. Fetch Comprehensive Finance Data including Analysts and Insiders
     const results = await (yahooFinance as any).quoteSummary(ticker, {
-      modules: ["summaryDetail", "financialData", "defaultKeyStatistics", "assetProfile", "price"]
+      modules: [
+        "summaryDetail", 
+        "financialData", 
+        "defaultKeyStatistics", 
+        "assetProfile", 
+        "price",
+        "recommendationTrend",
+        "insiderTransactions"
+      ]
     });
 
     const stats = {
@@ -30,7 +38,11 @@ export async function POST(request: Request) {
       profitMargins: results.financialData?.profitMargins || 0,
       revenueGrowth: results.financialData?.revenueGrowth || 0,
       returnOnEquity: results.financialData?.returnOnEquity || 0,
-      summary: results.assetProfile?.longBusinessSummary || ""
+      summary: results.assetProfile?.longBusinessSummary || "",
+      recommendation: results.financialData?.recommendationKey || "none",
+      targetMeanPrice: results.financialData?.targetMeanPrice || null,
+      recommendationTrend: results.recommendationTrend?.trend?.[0] || null, // Current month's trend
+      insiderTransactions: results.insiderTransactions?.transactions?.slice(0, 5) || [] // Last 5 insider trades
     };
 
     // 2. Institutional Research + 20yo Perspective Prompt
@@ -74,6 +86,15 @@ export async function POST(request: Request) {
 
     const deepDive = JSON.parse(aiResult.candidates?.[0]?.content?.parts?.[0]?.text || "{}");
 
+    // Format Insider Transactions for UI
+    const formattedInsiders = stats.insiderTransactions.map((trade: any) => ({
+      filerName: trade.filerName,
+      transactionText: trade.transactionText,
+      shares: trade.shares,
+      value: trade.value,
+      date: trade.startDate
+    }));
+
     return NextResponse.json({
       ticker: ticker.toUpperCase(),
       name: stats.name,
@@ -87,6 +108,12 @@ export async function POST(request: Request) {
         revenueGrowth: `${(stats.revenueGrowth * 100).toFixed(2)}%`,
         profitMargins: `${(stats.profitMargins * 100).toFixed(2)}%`
       },
+      marketSentiment: {
+        recommendation: stats.recommendation,
+        targetMeanPrice: stats.targetMeanPrice,
+        trend: stats.recommendationTrend
+      },
+      insiderTrades: formattedInsiders,
       analysis: deepDive
     });
 
