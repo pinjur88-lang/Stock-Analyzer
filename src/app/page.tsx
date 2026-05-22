@@ -58,9 +58,9 @@ export default function Dashboard() {
   };
 
   const Tooltip = ({ content, children }: { content: string, children: React.ReactNode }) => (
-    <div className="relative flex items-center group cursor-help">
+    <div className="relative flex items-center group/tooltip cursor-help">
       {children}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-neutral-800 text-neutral-200 text-xs rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap shadow-xl z-50 pointer-events-none border border-neutral-700">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-neutral-800 text-neutral-200 text-xs rounded-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all whitespace-nowrap shadow-xl z-50 pointer-events-none border border-neutral-700">
         {content}
         <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-neutral-800"></div>
       </div>
@@ -321,61 +321,7 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* The Great Debate */}
-                  <div className="bg-neutral-900 border border-neutral-800 rounded-[3rem] p-10 shadow-[0_-25px_50px_-12px_rgba(0,0,0,0.5)]">
-                    <div className="flex flex-col items-center justify-center text-center mb-12">
-                        <div className="p-4 bg-emerald-500/10 text-emerald-400 rounded-full mb-4 border border-emerald-500/20">
-                          <Swords className="w-10 h-10" />
-                        </div>
-                        <h2 className="text-4xl font-black tracking-tighter text-white">The Analyst Debate</h2>
-                        <p className="text-neutral-500 font-medium mt-2 max-w-lg italic">"Strong Opinions, Lightly Held" — Battle of the Consensus</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative">
-                        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-neutral-800 hidden lg:block"></div>
-                        
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-3">
-                              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                              <h3 className="text-xl font-black text-white uppercase tracking-tighter">Super Bull Strategy</h3>
-                          </div>
-                          <div className="bg-emerald-500/5 border border-emerald-500/20 p-8 rounded-[2rem] relative">
-                              <p className="text-neutral-200 leading-relaxed font-medium italic">
-                                {data.analysis.debate.bull}
-                              </p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-3 justify-end lg:justify-start">
-                              <h3 className="text-xl font-black text-white uppercase tracking-tighter order-2 lg:order-1">Super Bear Warning</h3>
-                              <XCircle className="w-6 h-6 text-red-500 order-1 lg:order-2" />
-                          </div>
-                          <div className="bg-red-500/5 border border-red-500/20 p-8 rounded-[2rem] relative">
-                              <p className="text-neutral-200 leading-relaxed font-medium italic text-right lg:text-left">
-                                {data.analysis.debate.bear}
-                              </p>
-                          </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-12 pt-12 border-t border-neutral-800">
-                        <div className="bg-neutral-950 w-full border border-neutral-800 rounded-[2.5rem] p-8">
-                          <div className="flex gap-6 items-start">
-                              <div className="p-4 bg-neutral-900 rounded-2xl flex-shrink-0 border border-neutral-800">
-                                <Scale className="w-8 h-8 text-neutral-400" />
-                              </div>
-                              <div>
-                                <h4 className="text-lg font-bold text-neutral-200 mb-2 tracking-tight">Neutral Observer Judgment</h4>
-                                <p className="text-neutral-400 leading-relaxed font-medium">
-                                  {data.analysis.debate.observer}
-                                </p>
-                              </div>
-                          </div>
-                        </div>
-                    </div>
-                  </div>
-                </div>
+                  {/* End Sector Dynamics */}
 
                 {/* Sidebar Analysis */}
                 <div className="space-y-8">
@@ -492,6 +438,62 @@ export default function Dashboard() {
                 </div>
 
               </div>
+            )}
+            {/* The Great Debate (Moved to Sentiment Tab) */}
+            {activeTab === "sentiment" && (
+                <div className="bg-neutral-900 border border-neutral-800 rounded-[3rem] p-10 shadow-[0_-25px_50px_-12px_rgba(0,0,0,0.5)] mt-8">
+                  <div className="flex flex-col items-center justify-center text-center mb-12">
+                      <div className="p-4 bg-emerald-500/10 text-emerald-400 rounded-full mb-4 border border-emerald-500/20">
+                        <Swords className="w-10 h-10" />
+                      </div>
+                      <h2 className="text-4xl font-black tracking-tighter text-white">The Analyst Debate</h2>
+                      <p className="text-neutral-500 font-medium mt-2 max-w-lg italic">"Strong Opinions, Lightly Held" — Battle of the Consensus</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative">
+                      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-neutral-800 hidden lg:block"></div>
+                      
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                            <h3 className="text-xl font-black text-white uppercase tracking-tighter">Super Bull Strategy</h3>
+                        </div>
+                        <div className="bg-emerald-500/5 border border-emerald-500/20 p-8 rounded-[2rem] relative">
+                            <p className="text-neutral-200 leading-relaxed font-medium italic">
+                              {data.analysis.debate.bull}
+                            </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3 justify-end lg:justify-start">
+                            <h3 className="text-xl font-black text-white uppercase tracking-tighter order-2 lg:order-1">Super Bear Warning</h3>
+                            <XCircle className="w-6 h-6 text-red-500 order-1 lg:order-2" />
+                        </div>
+                        <div className="bg-red-500/5 border border-red-500/20 p-8 rounded-[2rem] relative">
+                            <p className="text-neutral-200 leading-relaxed font-medium italic text-right lg:text-left">
+                              {data.analysis.debate.bear}
+                            </p>
+                        </div>
+                      </div>
+                  </div>
+
+                  <div className="mt-12 pt-12 border-t border-neutral-800">
+                      <div className="bg-neutral-950 w-full border border-neutral-800 rounded-[2.5rem] p-8">
+                        <div className="flex gap-6 items-start">
+                            <div className="p-4 bg-neutral-900 rounded-2xl flex-shrink-0 border border-neutral-800">
+                              <Scale className="w-8 h-8 text-neutral-400" />
+                            </div>
+                            <div>
+                              <h4 className="text-lg font-bold text-neutral-200 mb-2 tracking-tight">Neutral Observer Judgment</h4>
+                              <p className="text-neutral-400 leading-relaxed font-medium">
+                                {data.analysis.debate.observer}
+                              </p>
+                            </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
             )}
 
             {/* Hidden Risks Footer */}
