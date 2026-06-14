@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import yahooFinance from "yahoo-finance2";
 
+export const dynamic = "force-dynamic";
+
 // A curated list of 100+ established Canadian companies across various sectors
 const TSX_SYMBOLS = [
   'RY.TO', 'TD.TO', 'CNR.TO', 'CP.TO', 'ENB.TO', 'CNQ.TO', 'BMO.TO', 'BNS.TO', 'ATD.TO', 'CSU.TO', 
