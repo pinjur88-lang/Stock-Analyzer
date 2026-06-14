@@ -14,7 +14,8 @@ export default function Dashboard() {
   const [data, setData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [isFetchingTrending, setIsFetchingTrending] = useState(false);
-
+  const [isScanning, setIsScanning] = useState(false);
+  const [screenerReason, setScreenerReason] = useState("");
   const fetchAnalysis = async (searchTicker: string) => {
     if (!searchTicker) return;
     setLoading(true);
@@ -54,6 +55,26 @@ export default function Dashboard() {
       alert("Could not fetch trending stocks. Try searching manually.");
     } finally {
       setIsFetchingTrending(false);
+    }
+  };
+
+  const handleScreener = async () => {
+    setIsScanning(true);
+    setScreenerReason("");
+    try {
+      const res = await fetch("/api/screener");
+      const result = await res.json();
+      if (result.ticker) {
+        setTicker(result.ticker);
+        setScreenerReason(result.reason || "");
+        await fetchAnalysis(result.ticker);
+      } else {
+        alert("Could not find a match right now. Try again!");
+      }
+    } catch (error) {
+      alert("AI Screener encountered an error.");
+    } finally {
+      setIsScanning(false);
     }
   };
 
@@ -146,20 +167,28 @@ export default function Dashboard() {
             />
           </form>
 
-          <div className="flex items-center gap-4 mt-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 w-full">
             <button 
               onClick={handleSearch}
-              className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-lg text-sm font-medium text-neutral-300 transition-all"
+              className="px-6 py-3 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-xl text-sm font-bold text-neutral-300 transition-all shadow-lg w-full sm:w-auto"
             >
               Analyze Stock
             </button>
             <button 
               onClick={handleTrendingSearch}
-              disabled={isFetchingTrending}
-              className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-lg text-sm font-medium text-neutral-300 transition-all flex items-center gap-2 disabled:opacity-50"
+              disabled={isFetchingTrending || isScanning}
+              className="px-6 py-3 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-xl text-sm font-bold text-neutral-300 transition-all flex justify-center items-center gap-2 shadow-lg w-full sm:w-auto disabled:opacity-50"
             >
-              {isFetchingTrending ? <Loader2 className="w-4 h-4 animate-spin" /> : <TrendingUp className="w-4 h-4" />}
+              {isFetchingTrending ? <Loader2 className="w-4 h-4 animate-spin" /> : <TrendingUp className="w-4 h-4 text-emerald-500" />}
               Trending Active
+            </button>
+            <button 
+              onClick={handleScreener}
+              disabled={isScanning || isFetchingTrending}
+              className="px-6 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 rounded-xl text-sm font-black text-indigo-400 transition-all flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.2)] w-full sm:w-auto disabled:opacity-50"
+            >
+              {isScanning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+              {isScanning ? "AI Scanning TSX..." : "Find Undervalued Gem"}
             </button>
           </div>
 
@@ -217,8 +246,10 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="text-center space-y-2">
-              <h3 className="text-xl font-bold tracking-tight">Gathering Intelligence</h3>
-              <p className="text-neutral-500 animate-pulse font-medium max-w-xs mx-auto">Reviewing transcripts, sector dynamics, and calculating valuations...</p>
+              <h3 className="text-xl font-bold tracking-tight">{isScanning ? "AI Screener Active" : "Gathering Intelligence"}</h3>
+              <p className="text-neutral-500 animate-pulse font-medium max-w-xs mx-auto">
+                {isScanning ? "Scouring the TSX for undervalued gems using Benjamin Graham's intrinsic value formula..." : "Reviewing transcripts, sector dynamics, and calculating valuations..."}
+              </p>
             </div>
           </div>
         ) : data ? (
@@ -247,6 +278,16 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </div>
+                  
+                  {screenerReason && (
+                    <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-6 mb-8 flex gap-4 items-start">
+                       <Zap className="w-6 h-6 text-indigo-400 flex-shrink-0" />
+                       <div>
+                         <h4 className="text-sm font-black text-indigo-300 uppercase tracking-widest mb-1">AI Screener Alert</h4>
+                         <p className="text-sm text-indigo-100/80 font-medium leading-relaxed">{screenerReason}</p>
+                       </div>
+                    </div>
+                  )}
 
                   <div className="space-y-6">
                     <p className="text-lg text-neutral-300 leading-relaxed font-medium">
