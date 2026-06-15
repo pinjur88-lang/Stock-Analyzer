@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import YahooFinance from "yahoo-finance2";
 
+const yahooFinance = new YahooFinance();
+
 export async function GET() {
   try {
     // Fetch trending symbols for Canada
-    const results = await YahooFinance.trendingSymbols("CA");
+    const results = await yahooFinance.trendingSymbols("CA");
     
     // Fallback list if API fails to return symbols
     const fallbackSymbols = ["TD.TO", "SHOP.TO", "RY.TO", "SU.TO", "ENB.TO"];
